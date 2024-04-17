@@ -1,8 +1,15 @@
 import http.server
 import socketserver
 from http import HTTPStatus
-import openai
-from pydub import AudioSegment
+from transformers import WhisperProcessor, WhisperForConditionalGeneration
+from datasets import Audio, load_dataset
+
+
+# load model and processor
+processor = WhisperProcessor.from_pretrained("openai/whisper-large")
+model = WhisperForConditionalGeneration.from_pretrained("openai/whisper-large")
+forced_decoder_ids = processor.get_decoder_prompt_ids(language="english", task="translate")
+
 
 
 class Handler(http.server.SimpleHTTPRequestHandler):
@@ -19,15 +26,17 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         audio = self.rfile.read(content_len)
 
 
+        input_features = processor(audio, sampling_rate=16_000, return_tensors="pt").input_features
 
-        buffer = io.BytesIO()
-        buffer.name = "fname"
-        audio.export(buffer, format="mp3")
-        transcript = openai.Audio.transcribe("whisper-1", buffer)
+        # generate token ids
+        predicted_ids = model.generate(input_features, forced_decoder_ids=forced_decoder_ids)
+        # decode token ids to text
+        transcription = processor.batch_decode(predicted_ids, skip_special_tokens=True)
+
 
 
         self._set_headers()
-        self.wfile.write(transcript.encode())
+        self.wfile.write(transcription.encode())
 
     def do_GET(self):
         self.send_response(HTTPStatus.OK)
