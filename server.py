@@ -1,15 +1,11 @@
 import http.server
 import socketserver
 from http import HTTPStatus
-from transformers import WhisperProcessor, WhisperForConditionalGeneration
-from datasets import Audio, load_dataset
+from transformers import pipeline
+import gradio as gr
 
 
-# load model and processor
-processor = WhisperProcessor.from_pretrained("openai/whisper-large")
-model = WhisperForConditionalGeneration.from_pretrained("openai/whisper-large")
-forced_decoder_ids = processor.get_decoder_prompt_ids(language="english", task="translate")
-
+model = pipeline(model= "openai/whisper-large-v2")
 
 
 class Handler(http.server.SimpleHTTPRequestHandler):
@@ -26,12 +22,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         audio = self.rfile.read(content_len)
 
 
-        input_features = processor(audio, sampling_rate=16_000, return_tensors="pt").input_features
-
-        # generate token ids
-        predicted_ids = model.generate(input_features, forced_decoder_ids=forced_decoder_ids)
-        # decode token ids to text
-        transcription = processor.batch_decode(predicted_ids, skip_special_tokens=True)
+        transcription = model(audio)["text"]
 
 
 
