@@ -8,7 +8,7 @@ asr_model = nemo_asr.models.ASRModel.from_pretrained("stt_en_fastconformer_trans
 
 
 def save_to_file(data):
-    file = open('myfile.dat', 'wb')
+    file = open('temporary.wav', 'wb')
     file.truncate()
     file.write(data)
     file.close()
