@@ -5,9 +5,6 @@ import openai
 from pydub import AudioSegment
 
 
-model = whisper.load_model("base")
-
-
 class Handler(http.server.SimpleHTTPRequestHandler):
     def _set_headers(self):
         self.send_response(HTTPStatus.OK)
