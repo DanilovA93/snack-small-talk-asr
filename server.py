@@ -1,11 +1,18 @@
 import http.server
 import socketserver
-import json
-import nemo.collections.asr as nemo_asr
 from http import HTTPStatus
 
+import nemo.collections.asr as nemo_asr
 
 asr_model = nemo_asr.models.ASRModel.from_pretrained("stt_en_fastconformer_transducer_large")
+
+
+def save_to_file(data):
+    file = open('myfile.dat', 'wb')
+    file.truncate()
+    file.write(data)
+    file.close()
+    return file.name
 
 
 class Handler(http.server.SimpleHTTPRequestHandler):
@@ -20,10 +27,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     def do_POST(self):
         content_len = int(self.headers.get('Content-Length'))
         file = self.rfile.read(content_len)
-        path_to_file = "./files/demofile.wav"
-        f = open(path_to_file, "wb")
-        f.write(file)
-        f.close()
+        path_to_file = save_to_file(file)
         transcript = asr_model.transcribe([path_to_file])
         text = transcript[0][0]
         self._set_headers()
