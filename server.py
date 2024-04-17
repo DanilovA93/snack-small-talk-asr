@@ -20,11 +20,11 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     def do_POST(self):
         content_len = int(self.headers.get('Content-Length'))
         file = self.rfile.read(content_len)
-        # path_to_file = "./files/demofile.wav"
-        # f = open(path_to_file, "wb")
-        # f.write(file)
-        # f.close()
-        transcript = asr_model.transcribe(file)
+        path_to_file = "./files/demofile.wav"
+        f = open(path_to_file, "wb")
+        f.write(file)
+        f.close()
+        transcript = asr_model.transcribe([path_to_file])
         text = transcript[0][0]
         self._set_headers()
         self.wfile.write(text.encode())
