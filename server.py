@@ -1,11 +1,10 @@
 import http.server
 import socketserver
-import json
-import nemo.collections.asr as nemo_asr
 from http import HTTPStatus
+import whisper
 
 
-asr_model = nemo_asr.models.ASRModel.from_pretrained("stt_en_fastconformer_transducer_large")
+model = whisper.load_model("base")
 
 
 class Handler(http.server.SimpleHTTPRequestHandler):
@@ -19,15 +18,24 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
     def do_POST(self):
         content_len = int(self.headers.get('Content-Length'))
-        file = self.rfile.read(content_len)
-        path_to_file = "./files/demofile.wav"
-        f = open(path_to_file, "wb")
-        f.write(file)
-        f.close()
-        transcript = asr_model.transcribe([path_to_file])
-        text = transcript[0][0]
+        audio = self.rfile.read(content_len)
+        audio = whisper.pad_or_trim(audio)
+
+        mel = whisper.log_mel_spectrogram(audio).to(model.device)
+
+        # detect the spoken language
+        _, probs = model.detect_language(mel)
+        print(f"Detected language: {max(probs, key=probs.get)}")
+
+        # decode the audio
+        options = whisper.DecodingOptions()
+        result = whisper.decode(model, mel, options)
+
+        # print the recognized text
+        print(result.text)
+
         self._set_headers()
-        self.wfile.write(text.encode())
+        self.wfile.write(result.text.encode())
 
     def do_GET(self):
         self.send_response(HTTPStatus.OK)
