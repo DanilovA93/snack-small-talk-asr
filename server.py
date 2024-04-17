@@ -19,7 +19,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     def do_POST(self):
         content_len = int(self.headers.get('Content-Length'))
         audio = self.rfile.read(content_len)
-        audio = whisper.pad_or_trim(audio)
+        audio = whisper.load_audio(audio)
 
         mel = whisper.log_mel_spectrogram(audio).to(model.device)
 
