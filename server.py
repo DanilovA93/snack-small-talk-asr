@@ -1,7 +1,8 @@
 import http.server
 import socketserver
 from http import HTTPStatus
-import whisper
+import openai
+from pydub import AudioSegment
 
 
 model = whisper.load_model("base")
@@ -19,23 +20,17 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     def do_POST(self):
         content_len = int(self.headers.get('Content-Length'))
         audio = self.rfile.read(content_len)
-        audio = whisper.load_audio(audio)
 
-        mel = whisper.log_mel_spectrogram(audio).to(model.device)
 
-        # detect the spoken language
-        _, probs = model.detect_language(mel)
-        print(f"Detected language: {max(probs, key=probs.get)}")
 
-        # decode the audio
-        options = whisper.DecodingOptions()
-        result = whisper.decode(model, mel, options)
+        buffer = io.BytesIO()
+        buffer.name = "fname"
+        audio.export(buffer, format="mp3")
+        transcript = openai.Audio.transcribe("whisper-1", buffer)
 
-        # print the recognized text
-        print(result.text)
 
         self._set_headers()
-        self.wfile.write(result.text.encode())
+        self.wfile.write(transcript.encode())
 
     def do_GET(self):
         self.send_response(HTTPStatus.OK)
