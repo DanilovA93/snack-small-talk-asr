@@ -1,14 +1,14 @@
-pytorch_lightning
-librosa
-sentencepiece
-pandas
-inflect
-lhotse
-editdistance
-jiwer
-pyannote.core
-webdataset
-datasets
-pyannote.metrics
-ipython
-transformers
+pytorch_lightning == 2.2.2
+librosa == 0.10.0
+sentencepiece == 0.2.0
+pandas == 1.5.3
+inflect == 7.2.0
+lhotse == 1.22.0
+editdistance == 0.8.1
+jiwer == 3.0.3
+pyannote.core == 5.0.0
+webdataset == 0.2.86
+datasets == 2.19.0
+pyannote.metrics == 3.2.1
+ipython == 8.23.0
+transformers == 4.40.0
