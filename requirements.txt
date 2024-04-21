@@ -1,0 +1,16 @@
+git+https://github.com/NVIDIA/NeMo.git
+hydra-core #--upgrade
+pytorch_lightning
+librosa
+sentencepiece
+pandas
+inflect
+lhotse
+editdistance
+jiwer
+pyannote.core
+webdataset
+datasets
+pyannote.metrics
+IPython
+transformers
