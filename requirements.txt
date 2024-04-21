@@ -10,5 +10,5 @@ pyannote.core
 webdataset
 datasets
 pyannote.metrics
-IPython
+ipython
 transformers
