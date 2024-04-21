@@ -1,7 +1,7 @@
 #!/usr/bin/zsh
 sudo apt-get update
 sudo apt install python3-pip
-pip3 -r requirements.txt
+pip3 install -r requirements.txt
 pip3 install git+https://github.com/NVIDIA/NeMo.git
 pip3 install hydra-core --upgrade
 touch ./output.log
