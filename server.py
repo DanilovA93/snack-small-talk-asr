@@ -1,11 +1,7 @@
 import http.server
 import socketserver
 from http import HTTPStatus
-from transformers import pipeline
-import gradio as gr
-
-
-model = pipeline(model= "openai/whisper-large-v2")
+import ASRService
 
 
 class Handler(http.server.SimpleHTTPRequestHandler):
@@ -21,10 +17,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         content_len = int(self.headers.get('Content-Length'))
         audio = self.rfile.read(content_len)
 
-
-        transcription = model(audio)["text"]
-
-
+        transcription = ASRService.process(audio)
 
         self._set_headers()
         self.wfile.write(transcription.encode())
